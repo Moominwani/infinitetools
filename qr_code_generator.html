@@ -12,6 +12,56 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Lobster&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="qr_code_generator.css">
+      <script type="application/ld+json">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Image to PDF Converter</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Style CSS -->
+    <link rel="stylesheet" href="./image_to_pdf.css">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Infinite Tools",
+  "url": "https://infinitetools.web.app",
+  "logo": "https://infinitetools.web.app/infinite_tools.png"
+}
+</script>
+</head>
+<body>
+    <div class="container">
+        <h1>Image to PDF Converter</h1>
+        <p>Upload multiple images and convert them into a single PDF file.</p>
+
+        <!-- File Upload Section -->
+        <div class="upload-section">
+            <input type="file" id="file-input" accept="image/*" multiple>
+            <label for="file-input" class="upload-btn">
+                <i class="fas fa-upload"></i> Choose Images
+            </label>
+        </div>
+
+        <!-- Image Preview Section -->
+        <div id="image-preview" class="image-preview"></div>
+
+        <!-- Convert and Download Buttons -->
+        <div class="actions" style="display: none;">
+            <button id="convert-btn" disabled>Convert to PDF</button>
+            <button id="download-btn" disabled>Download PDF</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="./image_to_pdf.js"></script>
+</body>
+</html>
 </head>
 <body>
 
