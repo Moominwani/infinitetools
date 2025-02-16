@@ -1,0 +1,162 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwriting to Text Converter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.0.2/tesseract.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+        }
+        .custom-button {
+            display: block;
+            padding: 12px 20px;
+            margin: 10px auto;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+        }
+        .custom-button:hover {
+            background-color: #0056b3;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 50px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            white-space: pre-wrap;
+        }
+        #copyButton {
+            display: none;
+            margin-top: 10px;
+        }
+        video, canvas {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h2>Handwriting to Text Converter</h2>
+        <input type="file" id="imageInput" accept="image/*" class="custom-button">
+        <button onclick="openCamera()" class="custom-button">Scan with Camera</button>
+        <video id="camera" autoplay style="display: none;"></video>
+        <canvas id="canvas" style="display: none;"></canvas>
+        <button id="capture" onclick="captureImage()" class="custom-button" style="display: none;">Capture</button>
+        <div id="output">Extracted text will appear here...</div>
+        <button id="copyButton" onclick="copyText()" class="custom-button">Copy Text</button>
+    </div><script>
+    let currentStream = null;
+
+    function openCamera() {
+        let video = document.getElementById('camera');
+        let captureButton = document.getElementById('capture');
+        let constraints = {
+            video: { facingMode: { exact: 'environment' } }
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+            currentStream = stream;
+            video.srcObject = stream;
+            video.style.display = 'block';
+            captureButton.style.display = 'block';
+        }).catch((err) => {
+            alert("Camera access denied or not supported!");
+        });
+    }
+
+    function captureImage() {
+        let video = document.getElementById('camera');
+        let canvas = document.getElementById('canvas');
+        let context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        video.srcObject.getTracks().forEach(track => track.stop());
+        video.style.display = 'none';
+        document.getElementById('capture').style.display = 'none';
+        processImage(canvas);
+    }
+
+    document.getElementById('imageInput').addEventListener('change', function(event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    let canvas = document.createElement('canvas');
+                    let ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    processImage(canvas);
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function processImage(canvas) {
+        document.getElementById('output').innerText = "Processing...";
+        let image = canvas.toDataURL();
+        Tesseract.recognize(image, 'eng', {
+            logger: m => console.log(m),
+            tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+            preserve_interword_spaces: 1
+        }).then(({ data: { text } }) => {
+            text = text.replace(/[^a-zA-Z0-9\s]/g, ''); // Remove unwanted characters
+            if (text.trim().length < 3) {
+                document.getElementById('output').innerText = "No text detected.";
+                document.getElementById('copyButton').style.display = 'none';
+            } else {
+                document.getElementById('output').innerText = text;
+                document.getElementById('copyButton').style.display = 'block';
+            }
+        }).catch(err => {
+            document.getElementById('output').innerText = "Error: " + err;
+        });
+    }
+
+    function copyText() {
+        let text = document.getElementById('output').innerText;
+        if (text !== "Extracted text will appear here..." && text !== "No text detected.") {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Text copied to clipboard");
+            }).catch(err => {
+                alert("Failed to copy text");
+            });
+        }
+    }
+</script>
+
+</body>
+</html>

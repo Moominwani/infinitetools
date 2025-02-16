@@ -1,0 +1,100 @@
+/* Global Styles */
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: white;
+    color: black;
+    overflow-x: hidden;
+    text-align: center;
+    transition: background 0.3s, color 0.3s; /* Smooth transition for dark mode */
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+    background: #121212; /* Dark background */
+    color: white; /* Light text color */
+}
+
+/* Light Mode Styles */
+body.light-mode {
+    background: white; /* White background for light mode */
+    color: black; /* Dark text color for light mode */
+}
+
+/* Header with Toggle Button */
+header {
+    background: #00bcd4;
+    padding: 15px;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    transition: background-color 0.3s; /* Smooth transition for background */
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: white; /* White text for light mode (to be changed in dark mode) */
+    display: inline-block;
+    margin-right: 15px; /* Space for the toggle */
+    transition: color 0.3s; /* Smooth transition for text color */
+}
+
+/* Header styles for Dark Mode */
+body.dark-mode header h1 {
+    color: #121212; /* Dark text for header in dark mode */
+}
+
+/* Theme Toggle Button */
+.toggle-switch {
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+.toggle-switch input {
+    display: none; /* Hide the checkbox */
+}
+
+.icon {
+    font-size: 24px;
+    display: none;
+}
+
+/* Show Sun Icon for Light Mode */
+body.light-mode #sun-icon {
+    display: inline-block;
+}
+
+/* Show Moon Icon for Dark Mode */
+body.dark-mode #moon-icon {
+    display: inline-block;
+}
+
+/* Footer Section */
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 1px;
+    text-align: center;
+    backdrop-filter: blur(8px); /* Glass effect */
+    border-top: 2px solid rgba(255, 255, 255, 0.2); /* Subtle separator */
+    background: rgba(0, 0, 0, 0.5); /* Slight transparency */
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.5); /* Soft shadow */
+    z-index: 998; /* Keeps footer below navbar */
+}
+
+footer p {
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+}

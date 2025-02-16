@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Collage Maker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            width: 90%;
+            max-width: 1000px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .file-input-wrapper {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #imageCount {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+        #collage {
+            display: grid;
+            gap: 5px;
+            margin-top: 20px;
+            justify-content: center;
+            width: 100%;
+            height: auto;
+        }
+        #collage img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        #downloadBtn {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quick Collage Maker</h1>
+        <div id="imageCount">Images selected: 0</div>
+        <div class="file-input-wrapper" onclick="document.getElementById('imageInput').click();">
+            Choose Images
+        </div>
+        <input type="file" id="imageInput" multiple accept="image/*" onchange="updateImageCount()">
+        <button onclick="generateCollage()">Create Collage</button>
+        <button id="downloadBtn" onclick="downloadCollage()">Download Collage</button>
+        <div id="collage"></div>
+    </div>
+
+    <script>
+        let selectedImages = [];
+
+        function updateImageCount() {
+            const imageInput = document.getElementById('imageInput');
+            selectedImages = Array.from(imageInput.files);
+            document.getElementById('imageCount').textContent = `Images selected: ${selectedImages.length}`;
+        }
+
+        function generateCollage() {
+            const collageContainer = document.getElementById('collage');
+            collageContainer.innerHTML = '';
+
+            if (selectedImages.length > 0) {
+                let totalImages = selectedImages.length;
+                let columns = Math.ceil(Math.sqrt(totalImages)); 
+                let rows = Math.ceil(totalImages / columns);
+
+                collageContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+                collageContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+                selectedImages.forEach((file) => {
+                    const reader = new FileReader();
+
+                    reader.onload = function(event) {
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        collageContainer.appendChild(img);
+                    };
+
+                    reader.readAsDataURL(file);
+                });
+
+                document.getElementById('downloadBtn').style.display = 'inline-block';
+            } else {
+                alert('Please select images to create a collage.');
+            }
+        }
+
+        function downloadCollage() {
+            const collageContainer = document.getElementById('collage');
+            const images = collageContainer.querySelectorAll('img');
+
+            if (images.length === 0) {
+                alert("No images to download. Please create a collage first.");
+                return;
+            }
+
+            let totalImages = images.length;
+            let columns = Math.ceil(Math.sqrt(totalImages)); 
+            let rows = Math.ceil(totalImages / columns);
+
+            let gridWidth = 200; 
+            let gridHeight = 200;
+
+            let canvasWidth = columns * gridWidth;
+            let canvasHeight = rows * gridHeight;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+
+            let xOffset = 0;
+            let yOffset = 0;
+            let loadedImages = 0;
+
+            images.forEach((img, index) => {
+                const imgElement = new Image();
+                imgElement.src = img.src;
+
+                imgElement.onload = function() {
+                    ctx.drawImage(imgElement, xOffset, yOffset, gridWidth, gridHeight);
+                    loadedImages++;
+
+                    xOffset += gridWidth;
+
+                    if ((index + 1) % columns === 0) {
+                        xOffset = 0;
+                        yOffset += gridHeight;
+                    }
+
+                    if (loadedImages === images.length) {
+                        setTimeout(() => {
+                            const dataUrl = canvas.toDataURL('image/png');
+                            const link = document.createElement('a');
+                            link.href = dataUrl;
+                            link.download = 'collage.png';
+                            link.click();
+                        }, 500);
+                    }
+                };
+            });
+        }
+    </script>
+</body>
+</html>

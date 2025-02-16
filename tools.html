@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tools</title>
+    <link rel="stylesheet" href="tools.css">
+    <link rel="stylesheet" href="toggle.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .floating-search {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 1000;
+        }
+        .floating-search:hover {
+            background-color: #0056b3;
+        }
+        .search-bar {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+        .search-bar input {
+            width: 200px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        .search-results {
+            position: fixed;
+            bottom: 120px;
+            right: 20px;
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .search-results a {
+            display: block;
+            padding: 5px;
+            text-decoration: none;
+            color: black;
+        }
+        .search-results a:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Infinite Tools</h1>
+            <label class="toggle-switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+                <span id="sun-icon" class="icon"> 🌞Light </span>
+                <span id="moon-icon" class="icon">🌜Dark</span>
+            </label>
+        </div>
+    </header>
+    <section class="tool-section">
+        <div class="tool-container">
+            <h2>Available Tools</h2>
+            <div class="tools">
+                <a href="image_tools.html" class="tool" data-name="Image Tools, Image Compressor, Quick Collage Maker">
+                    <img src="image_compressor.png" alt="Image Compressor">
+                    <p>Image Tools</p>
+                </a>
+                <a href="calculator_tools.html" class="tool" data-name="Calculator Tools, BMI Calculator, Age Calculator">
+                    <img src="calculator.png" alt="Calculator Tools">
+                    <p>Calculator Tools</p>
+                </a>
+                <a href="pdf_tools.html" class="tool" data-name="PDF Tools, PDF Compressor, PDF Merger">
+                    <img src="pdf_tools.png" alt="PDF Tools">
+                    <p>PDF Tools</p>
+                </a>
+                <a href="qr_code_generator.html" class="tool" data-name="QR Code Generator">
+                    <img src="qr_code_generator.png" alt="QR Code Generator">
+                    <p>QR Code Generator</p>
+                </a>
+                <a href="currency.html" class="tool" data-name="Currency Converter">
+                    <img src="currency.png" alt="Currency Converter">
+                    <p>Currency Converter</p>
+                </a>
+                <a href="text_voice.html" class="tool" data-name="Text & Voice Tools, Text to Speech, Voice to Text">
+                    <img src="text_voice.png" alt="Text & Voice Tools">
+                    <p>Text & Voice Tools</p>
+                </a>
+                <a href="video_downloader.html" class="tool">
+                    <img src="video_downloader.png" alt="Video Downloader">
+                    <p>Video Downloader</p>
+                </a>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <p>&copy; Created by Moomin Wani</p>
+    </footer>
+    <button class="floating-search" onclick="toggleSearch()">🔍</button>
+    <div class="search-bar" id="search-bar">
+        <input type="text" id="search-input" placeholder="Search tools..." onkeyup="searchTools()">
+    </div>
+    <div class="search-results" id="search-results"></div>
+    <script>
+        const subTools = [
+            { name: "Image Compressor", link: "image_compressor.html" },
+            { name: "Image to PDF", link: "image_to_pdf.html" },
+            { name: "QR Code Generator", link: "qr_code_generator.html" },
+            { name: "Age Calculator", link: "age_calculator.html" },
+            { name: "BMI Calculator", link: "bmi_calculator.html" },
+            { name: "Voice Calculator", link: "voice_calculator.html" },
+            { name: "PDF Compressor", link: "pdf_compressor.html" },
+            { name: "Currency Converter", link: "currency_converter.html" },
+            { name: "Text to Speech Converter", link: "text_to_speech.html" },
+            { name: "YouTube Video Downloader", link: "video_downloader.html" }
+        ];
+
+        function toggleSearch() {
+            let searchBar = document.getElementById("search-bar");
+            searchBar.style.display = searchBar.style.display === "block" ? "none" : "block";
+        }
+
+        function searchTools() {
+            let query = document.getElementById("search-input").value.toLowerCase();
+            let resultsContainer = document.getElementById("search-results");
+            resultsContainer.innerHTML = "";
+            if (query === "") {
+                resultsContainer.style.display = "none";
+                return;
+            }
+            let results = subTools.filter(tool => tool.name.toLowerCase().includes(query));
+            if (results.length > 0) {
+                results.forEach(tool => {
+                    let resultItem = document.createElement("a");
+                    resultItem.href = tool.link;
+                    resultItem.textContent = tool.name;
+                    resultsContainer.appendChild(resultItem);
+                });
+                resultsContainer.style.display = "block";
+            } else {
+                resultsContainer.style.display = "none";
+            }
+        }
+    </script>
+    <script src="toggle.js"></script>
+</body>
+</html>

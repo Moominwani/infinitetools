@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image EXIF Viewer and Remover</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="file"] {
+            display: block;
+            margin: 0 auto 20px;
+            font-size: 16px;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="file"]:hover {
+            background-color: #0056b3;
+        }
+        #image {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        #output {
+            margin-top: 20px;
+            font-size: 14px;
+            background-color: #fafafa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        pre {
+            margin: 0;
+            font-size: 14px;
+            color: #333;
+        }
+        #downloadLink {
+            display: none;
+            margin-top: 20px;
+            text-decoration: none;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-align: center;
+            width: 100%;
+            display: block;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #downloadLink:hover {
+            background-color: #218838;
+        }
+        #clearButton {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #FF6347;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        #clearButton:hover {
+            background-color: #e03e2d;
+        }
+        .message {
+            color: #dc3545;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Image EXIF Viewer and Remover</h1>
+        <input type="file" id="fileInput" accept="image/*">
+        <br><br>
+        <img id="image" src="" alt="Uploaded Image" />
+        <div id="output"></div>
+        <br>
+        <a id="downloadLink" href="#" download="image_without_exif">Download Image without EXIF</a>
+        <br>
+        <button id="clearButton" style="display:none;">Clear</button>
+        <div id="message" class="message"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
+    <script>
+        const fileInput = document.getElementById("fileInput");
+        const output = document.getElementById("output");
+        const image = document.getElementById("image");
+        const downloadLink = document.getElementById("downloadLink");
+        const clearButton = document.getElementById("clearButton");
+        const message = document.getElementById("message");
+
+        fileInput.addEventListener("change", function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    image.src = event.target.result;
+
+                    // Attempt to get EXIF data
+                    EXIF.getData(file, function() {
+                        const allMetadata = EXIF.getAllTags(this);
+                        
+                        // Clean up metadata by removing irrelevant or empty values
+                        const cleanedMetadata = filterMetadata(allMetadata);
+
+                        // Check if EXIF data is available
+                        if (Object.keys(cleanedMetadata).length === 0) {
+                            output.textContent = "No EXIF data found in this image.";
+                            message.textContent = "This image doesn't have any EXIF data.";
+                        } else {
+                            output.textContent = JSON.stringify(cleanedMetadata, null, 2);
+                            message.textContent = ""; // Clear the message if EXIF data is found
+                        }
+                    });
+
+                    // Set up the EXIF remover
+                    removeExif(file);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function filterMetadata(metadata) {
+            // Remove empty or irrelevant fields (like undefined or null values)
+            return Object.fromEntries(
+                Object.entries(metadata).filter(([key, value]) => value !== undefined && value !== null)
+            );
+        }
+
+        function removeExif(file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    // Create a canvas to remove EXIF data
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    // Convert canvas to DataURL without EXIF data
+                    const dataUrl = canvas.toDataURL(file.type);
+                    downloadLink.href = dataUrl;
+                    downloadLink.style.display = 'inline-block';
+                    clearButton.style.display = 'inline-block';
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Clear button to reset the input
+        clearButton.addEventListener('click', function() {
+            fileInput.value = '';
+            image.src = '';
+            output.textContent = '';
+            downloadLink.style.display = 'none';
+            clearButton.style.display = 'none';
+            message.textContent = '';
+        });
+    </script>
+
+</body>
+</html>

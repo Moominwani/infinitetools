@@ -1,0 +1,140 @@
+/* Global Styles */
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: white;
+    color: black;
+    overflow-x: hidden;
+    text-align: center;
+}
+
+/* Header with Toggle Button (Navbar from Home Page) */
+header {
+    background: #00bcd4;
+    padding: 15px;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    transition: background-color 0.3s; /* Smooth transition for background */
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: white; /* White text for light mode (to be changed in dark mode) */
+    display: inline-block;
+    margin-right: 15px; /* Space for the toggle */
+    transition: color 0.3s; /* Smooth transition for text color */
+}
+
+/* Header styles for Dark Mode */
+body.dark-mode header h1 {
+    color: #121212; /* Dark text for header in dark mode */
+}
+
+/* Tool Section */
+.tool-section {
+    padding: 80px 10px 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.tool-container {
+    width: 100%;
+    max-width: 1000px;
+}
+
+/* Grid Layout for Tools */
+.tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Smaller tools */
+    gap: 10px;
+    justify-content: center;
+}
+
+/* Tool Buttons */
+.tool {
+    background: #f9f9f9;
+    padding: 10px; /* Smaller padding */
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 80px; /* Smaller width */
+    height: 80px; /* Smaller height */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.tool img {
+    width: 40px; /* Smaller icon */
+    height: 40px;
+    margin-bottom: 5px;
+}
+
+.tool p {
+    font-size: 10px; /* Smaller text */
+    font-weight: bold;
+    color: black;
+}
+
+.tool:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Footer */
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 1px;
+    text-align: center;
+    backdrop-filter: blur(8px); /* Glass effect */
+    border-top: 2px solid rgba(255, 255, 255, 0.2); /* Subtle separator */
+    background: rgba(0, 0, 0, 0.5); /* Slight transparency */
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.5); /* Soft shadow */
+    z-index: 998; /* Keeps footer below navbar */
+}
+
+footer p {
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+/* Media Queries for Responsiveness */
+
+/* For screens larger than 768px (tablet and desktop) */
+@media (min-width: 768px) {
+    header h1 {
+        font-size: 28px; /* Adjust header size */
+    }
+}
+
+/* For very large screens (e.g., desktops, large laptops) */
+@media (min-width: 1200px) {
+    header {
+        padding: 20px; /* Add more space in the header */
+    }
+}
+/* Fade-in effect for the header */
+header h1 {
+  opacity: 0;
+  animation: fadeIn 2s forwards; /* 2s for fade-in effect */
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

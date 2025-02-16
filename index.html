@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        if (localStorage.getItem("passwordEntered") !== "true") {
+            window.location.href = "password.html"; // Redirect if password not entered
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Tools</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Lobster&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="toggle.css">
+
+    <style>
+        /* Floating search button on the right */
+        .search-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 50px;
+            font-size: 24px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        /* Floating dark/light mode button on the left */
+        .dark-light-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 50px;
+            font-size: 24px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        /* Search input (hidden initially) */
+        .search-box {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 80%;
+            max-width: 300px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: none;
+            background: white;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* Tools container for search results */
+        .tools-container {
+            position: fixed;
+            bottom: 120px;
+            right: 20px;
+            width: 80%;
+            max-width: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .tool {
+            padding: 8px 12px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            transition: background 0.3s ease;
+        }
+
+        .tool:last-child {
+            border-bottom: none;
+        }
+
+        .tool:hover {
+            background-color: #e9ecef;
+        }
+
+        /* Header content and icons */
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            z-index: 2000;
+        }
+
+        .icon {
+            font-size: 20px;
+        }
+
+        /* Theme toggle button (hidden) */
+        .toggle-switch {
+            display: none; /* Hide the toggle button */
+        }
+
+        /* Ensure the header and toggle are visible on mobile */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .toggle-switch {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+        }
+
+        /* Ensure toggle is visible on desktop */
+        @media (min-width: 769px) {
+            .toggle-switch {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+        }
+
+        /* Dark mode styles */
+        .dark-mode {
+            background-color: #333;
+            color: white;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dark-mode .navbar {
+            background-color: #444444;
+        }
+        .dark-mode .navbar-nav .nav-link {
+            color: #000000;
+        }
+
+        /* Animation on hover */
+        .search-btn:hover,
+        .dark-light-btn:hover {
+            transform: scale(1.1);
+            background-color: #0056b3;
+        }
+
+        /* Smooth transition when the search box appears */
+        .search-box.show {
+            opacity: 1;
+        }
+
+        /* Smooth transition when the tool results appear */
+        .tools-container.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header Section -->
+<header>
+    <div class="header-content">
+        <h1>Infinite Tools</h1>
+    </div>
+</header>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="z-index: 9999; position: fixed; top: 60px; left: 0; width: 100%;">
+    <a class="navbar-brand" href="#">HOME</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="index.html">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="tools.html">Tools</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="contact.html">Contact</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<main>
+    <section id="home">
+        <h1>Welcome to Infinite Tools</h1>
+        <p>Explore a world of convenience with Infinite Tools. Whether you're working, studying, or just browsing, our platform is designed to simplify your digital experience.</p>
+        
+        <h2>Efficiency at Your Fingertips</h2>
+        <p>We believe in providing fast, reliable, and user-friendly solutions for everyday needs. Our platform ensures smooth performance without unnecessary complexity.</p>
+
+        <h2>Designed for Everyone</h2>
+        <p>Ultim Tools is built with simplicity in mind, making it accessible to everyone—from professionals to casual users. No installations, no hassle—just pure efficiency.</p>
+
+        <h2>Stay Connected</h2>
+        <p>We continuously improve to meet your needs. Have suggestions? We'd love to hear from you! Visit our <a class="nav-link" href="contact.html">Contact page</a> to share your feedback.</p>
+    </section>
+</main>
+
+<!-- Footer Section -->
+<footer>
+    <p><u>&copy; Created by Moomin Wani</u></p>
+</footer>
+
+<!-- Floating Search Button -->
+<div class="search-btn" onclick="toggleSearch()">🔍</div>
+
+<!-- Floating Dark/Light Mode Button -->
+<div class="dark-light-btn" onclick="toggleTheme()">🌞</div>
+
+<!-- Hidden Search Box -->
+<input type="text" class="search-box" id="searchInput" placeholder="Search tools..." oninput="searchTools()">
+
+<!-- Tools search results -->
+<div class="tools-container" id="toolsList"></div>
+
+<script>
+    // Toggle search box visibility with animation
+    function toggleSearch() {
+        let searchBox = document.getElementById('searchInput');
+        let toolsList = document.getElementById('toolsList');
+
+        // If the search box is hidden, show it and focus
+        if (searchBox.style.display === "none" || searchBox.style.display === "") {
+            searchBox.style.display = "block";
+            setTimeout(() => searchBox.classList.add('show'), 10); // Add transition after setting display
+            searchBox.focus(); // Focus on the input field
+            toolsList.style.display = "none"; // Hide the tools list when search box is shown
+        } else {
+            // If the search box is shown, hide it
+            searchBox.classList.remove('show');
+            setTimeout(() => searchBox.style.display = "none", 300); // Wait for animation before hiding
+            toolsList.style.display = "none"; // Hide the tools list
+        }
+    }
+
+    // Dynamically search tools
+    function searchTools() {
+        let input = document.getElementById('searchInput').value.toLowerCase();
+        let tools = [
+            { name: "Image Compressor", link: "image_compressor.html" },
+            { name: "Image to PDF", link: "image_to_pdf.html" },
+            { name: "QR Code Generator", link: "qr_code_generator.html" },
+            { name: "Age Calculator", link: "age_calculator.html" },
+            { name: "BMI Calculator", link: "bmi_calculator.html" },
+            { name: "Voice Calculator", link: "voice_calculator.html" },
+            { name: "PDF Compressor", link: "pdf_compressor.html" },
+            { name: "Currency Converter", link: "currency.html" },
+            { name: "Text to Speech Converter", link: "text_to_speech.html" },
+            { name: "YouTube Video Downloader", link: "video_downloader.html" }
+        ];
+
+        let toolsContainer = document.getElementById('toolsList');
+        toolsContainer.innerHTML = "";
+
+        if (input) {
+            tools.forEach(tool => {
+                if (tool.name.toLowerCase().includes(input)) {
+                    let div = document.createElement('div');
+                    div.classList.add('tool');
+                    div.innerHTML = `<a href="${tool.link}">${tool.name}</a>`;
+                    toolsContainer.appendChild(div);
+                }
+            });
+        }
+
+        toolsContainer.style.display = toolsContainer.children.length > 0 ? 'flex' : 'none';
+        toolsContainer.classList.add('show');
+    }
+
+    // Dark/light theme toggle
+    function toggleTheme() {
+        let body = document.body;
+        body.classList.toggle('dark-mode');
+    }
+</script>
+
+</body>
+</html>
